@@ -2,7 +2,7 @@
 
     function getObjects(){
         return function($resp){
-            $resp -> send(json_encode(resources_extractor_recursive(ROOT . "/resources/objects")), 404);
+            $resp -> send(json_encode(resources_extractor_recursive(ROOT . "/resources/objects")), 200);
         };
     }
 
