@@ -1,0 +1,23 @@
+{
+    "db006a79-2a24-4b6a-9cc0-aad8c73a20ed": {
+        "8f55c3ce-b910-4e37-8e48-581c0ccdd649": {
+            "bahaviors": {
+                "cbe66328-2bb2-4451-a20c-17a71b6f7d5c": {
+                    "off": "screen off",
+                    "on": "screen on",
+                    "broke": "screen broken"
+                },
+                "42a55f0f-d744-47f9-b00c-b8c6324b9f50": {
+                    "off": "powered on",
+                    "on": "already on",
+                    "broke": "nothing happen"
+                },
+                "f3c9a9a2-1e37-4447-8ddf-aaa5ea3f1da9": {
+                    "off": "already off",
+                    "on": "powered off",
+                    "broke": "already off"
+                }
+            }
+        }
+    }
+}
