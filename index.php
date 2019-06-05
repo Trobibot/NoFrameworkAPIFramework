@@ -17,10 +17,13 @@
     require_once (ROOT . "/routers/root.router.php");
     require_once (ROOT . "/handlers/object.handler.php");
     require_once (ROOT . "/routers/object.router.php");
+    require_once (ROOT . "/handlers/behavior.handler.php");
+    require_once (ROOT . "/routers/behavior.router.php");
 
     $app = new App();
     $app -> setEndpoint("/", $rootRouter);
     $app -> setEndpoint("/objects", $objectRouter);
+    $app -> setEndpoint("/behaviors", $behaviorRouter);
 
     // $app -> setEndpoint(
     //     "/tests",
