@@ -6,11 +6,50 @@
             $this -> endpoint = null;
             $this -> middlewares = null;
             $this -> get = [];
+            $this -> head = [];
             $this -> post = [];
+            $this -> put = [];
+            $this -> delete = [];
+            $this -> connect = [];
+            $this -> options = [];
+            $this -> trace = [];
+            $this -> patch = [];
         }
 
         public function get($url, $middlewares){
             $this -> get[$url] = $middlewares;
+        }
+
+        public function head($url, $middlewares){
+            $this -> head[$url] = $middlewares;
+        }
+
+        public function post($url, $middlewares){
+            $this -> post[$url] = $middlewares;
+        }
+
+        public function put($url, $middlewares){
+            $this -> put[$url] = $middlewares;
+        }
+
+        public function delete($url, $middlewares){
+            $this -> delete[$url] = $middlewares;
+        }
+
+        public function connect($url, $middlewares){
+            $this -> connect[$url] = $middlewares;
+        }
+
+        public function options($url, $middlewares){
+            $this -> options[$url] = $middlewares;
+        }
+
+        public function trace($url, $middlewares){
+            $this -> trace[$url] = $middlewares;
+        }
+
+        public function patch($url, $middlewares){
+            $this -> patch[$url] = $middlewares;
         }
 
         public function findPath($method, $url){
