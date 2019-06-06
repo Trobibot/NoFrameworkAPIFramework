@@ -5,6 +5,11 @@
     $objectRouter -> get("/", [
         getObjects()
     ]);
+    
     $objectRouter -> get("/:id", [
         getObjectById()
+    ]);
+
+    $objectRouter -> post("/", [
+        postObject()
     ]);

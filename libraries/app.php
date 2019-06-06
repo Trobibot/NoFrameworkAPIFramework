@@ -28,6 +28,9 @@
                 $route = str_replace($endpoint, "", $url) === "" ? "/" : str_replace($endpoint, "", $url);
                 $path = $router -> findPath($method, $route);
                 $params = array_merge([new Response()], $router -> getParamOfPath($path, $route));
+                $body = $router -> getRequestBody();
+                if ($body)
+                    $params = array_merge($params, $body);
                 foreach ($router -> $method[$path] as $middelware) {
                     call_user_func_array($middelware, $params);
                 }

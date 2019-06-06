@@ -80,4 +80,8 @@
                 throw new Exception("Method not allowed", 405);
         }
 
+        public function getRequestBody(){
+            return count($_REQUEST) > 0 ? array($_REQUEST) : null;
+        }
+
     }
