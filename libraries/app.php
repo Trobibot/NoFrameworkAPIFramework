@@ -36,10 +36,9 @@
         }
 
         private function findEndpoint($url){
-            foreach(array_keys($this -> routers) as $endpoint){
-                if (preg_match("/^" . str_replace("/", "\\/", $endpoint) ."/", $url, $matches))
-                    return $matches[0];
-            }
+            foreach(array_keys($this -> routers) as $endpoint)
+                if (preg_match("/^" . str_replace("/", "\\/", $endpoint) ."(\\/|$)/", $url, $match))
+                    return $match[0];
             throw new Exception("Not found", 404);
         }
 
