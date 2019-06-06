@@ -24,10 +24,11 @@
             try{
                 $endpoint = $this -> findEndpoint($url);
                 $router = $this -> routers[$endpoint];
+                $method = $router -> getRequestMethod();
                 $route = str_replace($endpoint, "", $url) === "" ? "/" : str_replace($endpoint, "", $url);
-                $path = $router -> findPath($route);
+                $path = $router -> findPath($method, $route);
                 $params = array_merge([new Response()], $router -> getParamOfPath($path, $route));
-                foreach ($router -> get[$path] as $middelware) {
+                foreach ($router -> $method[$path] as $middelware) {
                     call_user_func_array($middelware, $params);
                 }
             } catch (Exception $exc){
