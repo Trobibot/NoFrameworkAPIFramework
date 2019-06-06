@@ -23,8 +23,6 @@
         public function listen($url){
             try{
                 $endpoint = $this -> findEndpoint($url);
-                if (!$endpoint)
-                    throw new Exception("Not found", 404);
                 $router = $this -> routers[$endpoint];
                 $route = str_replace($endpoint, "", $url) === "" ? "/" : str_replace($endpoint, "", $url);
                 $path = $router -> findPath($route);
@@ -38,21 +36,11 @@
         }
 
         private function findEndpoint($url){
-            $urlChunks = explode("/", ltrim($url, "/"));
-            $goodURL = null;
-            foreach ($urlChunks as $key => $value) {
-                $testedURL = $value;
-                if ($key > 0)
-                    $testedURL = $urlChunks[$key - 1] . "\\/" . $value;
-                $routerURLMatched = preg_grep("/^\\/" . $testedURL . "/", array_keys($this -> routers));
-                if (count($routerURLMatched) > 0){
-                    usort($routerURLMatched,'sortBySmallerString');
-                    $goodURL = $routerURLMatched[0];
-                } else {
-                    return $goodURL;
-                }
+            foreach(array_keys($this -> routers) as $endpoint){
+                if (preg_match("/^" . str_replace("/", "\\/", $endpoint) ."/", $url, $matches))
+                    return $matches[0];
             }
-            return $goodURL;
+            throw new Exception("Not found", 404);
         }
 
     }
