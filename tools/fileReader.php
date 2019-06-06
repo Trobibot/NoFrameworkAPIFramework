@@ -3,8 +3,10 @@
     function resources_extractor($path){
         if(is_file($path))
             return json_decode(file_get_contents($path));
-        else
+        else if(is_dir($path))
             return array_values(array_diff(scandir($path), [".", ".."]));
+        else
+            throw new Exception("Not found", 404);
     }
 
     function resources_extractor_recursive($path){
