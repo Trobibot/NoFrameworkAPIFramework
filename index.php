@@ -7,7 +7,6 @@
     require_once (ROOT . "/libraries/app.php");
     require_once (ROOT . "/libraries/router.php");
     require_once (ROOT . "/libraries/handler.php");
-    require_once (ROOT . "/libraries/validator.php");
     require_once (ROOT . "/libraries/response.php");
     require_once (ROOT . "/libraries/exceptionHandler.php");
     require_once (ROOT . "/tools/tools.php");
@@ -25,13 +24,6 @@
     $app -> setEndpoint("/", $rootRouter);
     $app -> setEndpoint("/objects", $objectRouter);
     $app -> setEndpoint("/behaviors", $behaviorRouter);
-
-    // $app -> setEndpoint(
-    //     "/tests",
-    //     $testRouter,
-    //     [
-    //         new TestValidator(),
-    //     ]);
 
     header('Content-Type: ' . CONTENT_TYPE);
     $app -> listen($_SERVER["REQUEST_URI"]);
