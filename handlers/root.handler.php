@@ -1,7 +1,7 @@
 <?php
 
     function getRoot(){
-        return function(){
-            var_dump("API ROOT V1.0");
+        return function($resp){
+            $resp -> send(json_encode("NoFramework API V0.1"), 200);
         };
     }
