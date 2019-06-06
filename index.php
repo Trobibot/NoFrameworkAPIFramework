@@ -9,6 +9,7 @@
     require_once (ROOT . "/libraries/handler.php");
     require_once (ROOT . "/libraries/validator.php");
     require_once (ROOT . "/libraries/response.php");
+    require_once (ROOT . "/libraries/exceptionHandler.php");
     require_once (ROOT . "/tools/tools.php");
 
     /*** IMPORT USER SCRIPTS ***/

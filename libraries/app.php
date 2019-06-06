@@ -12,20 +12,28 @@
                 $router -> middelwares = $middelwares;
                 $this -> routers[$url] = $router;
             } else {
-                throw new Exception($url . " is already used by :" . get_class($router));
+                try {
+                    throw new Exception($url . " is already used by :" . get_class($router), 403);
+                } catch (Exception $exc) {
+                    catchException($exc);
+                }
             }
         }
 
         public function listen($url){
-            $endpoint = $this -> findEndpoint($url);
-            if (!$endpoint)
-                throw new Exception("not found", 404);
-            $router = $this -> routers[$endpoint];
-            $route = str_replace($endpoint, "", $url) === "" ? "/" : str_replace($endpoint, "", $url);
-            $path = $router -> findPath($route);
-            $params = array_merge([new Response()], $router -> getParamOfPath($path, $route));
-            foreach ($router -> get[$path] as $middelware) {
-                call_user_func_array($middelware, $params);
+            try{
+                $endpoint = $this -> findEndpoint($url);
+                if (!$endpoint)
+                    throw new Exception("Not found", 404);
+                $router = $this -> routers[$endpoint];
+                $route = str_replace($endpoint, "", $url) === "" ? "/" : str_replace($endpoint, "", $url);
+                $path = $router -> findPath($route);
+                $params = array_merge([new Response()], $router -> getParamOfPath($path, $route));
+                foreach ($router -> get[$path] as $middelware) {
+                    call_user_func_array($middelware, $params);
+                }
+            } catch (Exception $exc){
+                catchException($exc);
             }
         }
 
