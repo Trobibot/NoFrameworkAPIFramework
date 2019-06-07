@@ -1,9 +1,11 @@
 <?php
 
+    // Init Framework
     define('ROOT', dirname(__FILE__));
-        
     require_once (ROOT . "/bin/conf/config.php");
-    require_once (ROOT . "/libraries/main.php");
+    require_once (ROOT . "/libraries/initConf.php");
+
+    // Import Framework's Libraries
     require_once (ROOT . "/libraries/app.php");
     require_once (ROOT . "/libraries/router.php");
     require_once (ROOT . "/libraries/handler.php");
@@ -11,7 +13,7 @@
     require_once (ROOT . "/libraries/exceptionHandler.php");
     require_once (ROOT . "/tools/tools.php");
 
-    /*** IMPORT USER SCRIPTS ***/
+    // Import User's Scripts
     require_once (ROOT . "/tools/fileReader.php");
     require_once (ROOT . "/handlers/root.handler.php");
     require_once (ROOT . "/routers/root.router.php");
