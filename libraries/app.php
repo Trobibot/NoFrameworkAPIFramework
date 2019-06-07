@@ -31,6 +31,9 @@
                 $body = $router -> getRequestBody();
                 if ($body)
                     $params = array_merge($params, $body);
+                foreach ($router -> middelwares as $middelware) {
+                    $middelware();
+                }
                 foreach ($router -> $method[$path] as $middelware) {
                     call_user_func_array($middelware, $params);
                 }
