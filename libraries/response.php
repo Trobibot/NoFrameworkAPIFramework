@@ -1,14 +1,12 @@
 <?php
 
-    class Response{
+    final class Response{
 
-        public function __construct(){
+        private function __construct(){}
 
-        }
-
-        public function send($content, $status){
+        static public function send($content, $status){
             http_response_code($status);
-            echo $content;
+            echo json_encode($content);
         }
 
     }

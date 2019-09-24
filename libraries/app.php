@@ -15,7 +15,7 @@
                 try {
                     throw new Exception($url . " is already used by :" . get_class($router), 403);
                 } catch (Exception $exc) {
-                    catchException($exc);
+                    ExceptionHandler::catchException($exc);
                 }
             }
         }
@@ -27,7 +27,7 @@
                 $method = $router -> getRequestMethod();
                 $route = str_replace($endpoint, "", $url) === "" ? "/" : str_replace($endpoint, "", $url);
                 $path = $router -> findPath($method, $route);
-                $params = array_merge([new Response()], $router -> getParamOfPath($path, $route));
+                $params = $router -> getParamOfPath($path, $route);
                 $body = $router -> getRequestBody();
                 if ($body)
                     $params = array_merge($params, $body);
@@ -38,7 +38,7 @@
                     call_user_func_array($middelware, $params);
                 }
             } catch (Exception $exc){
-                catchException($exc);
+                ExceptionHandler::catchException($exc);
             }
         }
 
