@@ -1,9 +1,0 @@
-{
-    "name": "switch off",
-    "command": [
-        "turn off",
-        "power off",
-        "powered off",
-        "switch off"
-    ]
-}
