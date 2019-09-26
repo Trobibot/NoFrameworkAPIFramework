@@ -15,13 +15,10 @@
 
     // Import User's Scripts
     require_once (ROOT . "/database/orm.php");
-    require_once (ROOT . "/tools/fileReader.php");
     require_once (ROOT . "/handlers/root.handler.php");
     require_once (ROOT . "/routers/root.router.php");
-    require_once (ROOT . "/handlers/object.handler.php");
-    require_once (ROOT . "/routers/object.router.php");
-    require_once (ROOT . "/handlers/behavior.handler.php");
-    require_once (ROOT . "/routers/behavior.router.php");
+    require_once (ROOT . "/handlers/demo/users.handler.php");
+    require_once (ROOT . "/routers/demo/users.router.php");
 
     $orm = ORM::getInstance();
     $orm -> newTable("USERS",    ["nickname", "password"]);
@@ -34,9 +31,9 @@
     $orm -> getTable("CONTESTS") -> newRow(["first_player"  => "1"          , "second_player" => "3"        , "winner" => "3"   ]);
     $orm -> getTable("CONTESTS") -> newRow(["first_player"  => "2"          , "second_player" => "3"        , "winner" => "tie" ]);
 
+    $app = new App();
+    $app -> setEndpoint("/", $rootRouter);
     $app -> setEndpoint("/users", $usersRouter);
-    $app -> setEndpoint("/objects", $objectRouter);
-    $app -> setEndpoint("/behaviors", $behaviorRouter);
 
     header('Content-Type: ' . CONTENT_TYPE);
     $app -> listen($_SERVER["REQUEST_URI"]);
