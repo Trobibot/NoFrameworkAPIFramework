@@ -52,24 +52,31 @@
             $this -> patch[$url] = $middlewares;
         }
 
-        public function findPath($method, $url){
+        public function findPath($method, $url) {
             foreach (array_keys($this -> $method) as $path) {
-                $pathRegexp = preg_replace("/(|^)\\/(?!])/", "\\/", preg_replace("/:[^\\/]+/", "[^\\/]+", $path));
-                if (preg_match("/^" . $pathRegexp . "$/", $url) > 0)
+                $pathRegexp = "/^" . preg_replace("/\//", "\\/", preg_replace("/(?!\\/):[^\\/]+/", "([^/]+)", $path)) . "$/";
+                if (preg_match_all($pathRegexp, $url) > 0)
                     return $path;
             }
+            return null;
         }
 
-        public function getParamOfPath($path, $url){
-            $params = [];
-            $pathChunks = explode("/", $path);
-            $urlChunks = explode("/", $url);
-            array_shift($pathChunks);
-            array_shift($urlChunks);
-            foreach($pathChunks as $key => $chunk)
-                if (preg_match("/:[^\\/]+/", $chunk, $matches))
-                    $params[ltrim($matches[0], ":")] = $urlChunks[$key];
-            return $params;
+        public function getParamOfPath($method, $url){
+            $pathParamsName = array();
+            $tempPathParams = array();
+            $pathParams = array();
+            foreach (array_keys($this -> $method) as $path) {
+                preg_match_all("/(?!\\/)(?::)([^\\/]+)/", $path, $pathParamsName);
+                $pathRegexp = "/^" . preg_replace("/\//", "\\/", preg_replace("/(?!\\/):[^\\/]+/", "([^/]+)", $path)) . "$/";
+                if (preg_match_all($pathRegexp, $url, $tempPathParams) > 0) {
+                    $pathParamsName = array_flatten(array_slice($pathParamsName, 1));
+                    $tempPathParams = array_flatten(array_slice($tempPathParams, 1));
+                    foreach ($pathParamsName as $key => $paramName)
+                        $pathParams[$paramName] = $tempPathParams[$key];
+                    return $pathParams;
+                }
+            }
+            return null;
         }
 
         public function getRequestMethod(){
