@@ -14,6 +14,7 @@
     require_once (ROOT . "/tools/tools.php");
 
     // Import User's Scripts
+    require_once (ROOT . "/database/orm.php");
     require_once (ROOT . "/tools/fileReader.php");
     require_once (ROOT . "/handlers/root.handler.php");
     require_once (ROOT . "/routers/root.router.php");
@@ -21,6 +22,17 @@
     require_once (ROOT . "/routers/object.router.php");
     require_once (ROOT . "/handlers/behavior.handler.php");
     require_once (ROOT . "/routers/behavior.router.php");
+
+    $orm = ORM::getInstance();
+    $orm -> newTable("USERS",    ["nickname", "password"]);
+    $orm -> newTable("CONTESTS", ["first_player", "second_player", "winner"]);
+
+    $orm -> getTable("USERS")    -> newRow(["nickname"      => "Bradley"    , "password"      => "Pirate"   ]);
+    $orm -> getTable("USERS")    -> newRow(["nickname"      => "Bertille"   , "password"      => "Crochue"  ]);
+    $orm -> getTable("USERS")    -> newRow(["nickname"      => "Jean"       , "password"      => "Guy"      ]);
+    $orm -> getTable("CONTESTS") -> newRow(["first_player"  => "1"          , "second_player" => "2"        , "winner" => "1"   ]);
+    $orm -> getTable("CONTESTS") -> newRow(["first_player"  => "1"          , "second_player" => "3"        , "winner" => "3"   ]);
+    $orm -> getTable("CONTESTS") -> newRow(["first_player"  => "2"          , "second_player" => "3"        , "winner" => "tie" ]);
 
     $app = new App();
     $app -> setEndpoint("/", $rootRouter);
