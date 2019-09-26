@@ -4,7 +4,7 @@
 
         private function __construct(){}
 
-        static public function catchException(Exception $exc){
+        static public function catch(Exception $exc){
             Response::send($exc -> getMessage(), $exc -> getCode());
             exit;
         }

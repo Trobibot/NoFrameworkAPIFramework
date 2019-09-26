@@ -15,7 +15,7 @@
                 try {
                     throw new Exception($url . " is already used by :" . get_class($router), 403);
                 } catch (Exception $exc) {
-                    ExceptionHandler::catchException($exc);
+                    ExceptionHandler::catch($exc);
                 }
             }
         }
@@ -38,7 +38,7 @@
                     call_user_func_array($middelware, $params);
                 }
             } catch (Exception $exc){
-                ExceptionHandler::catchException($exc);
+                ExceptionHandler::catch($exc);
             }
         }
 
