@@ -31,7 +31,7 @@
     $orm -> getTable("CONTESTS") -> newRow(["first_player"  => "1"          , "second_player" => "3"        , "winner" => "3"   ]);
     $orm -> getTable("CONTESTS") -> newRow(["first_player"  => "2"          , "second_player" => "3"        , "winner" => "tie" ]);
 
-    $app = new App();
+    $app = App::getInstance();
     $app -> setEndpoint("/", $rootRouter);
     $app -> setEndpoint("/users", $usersRouter);
 

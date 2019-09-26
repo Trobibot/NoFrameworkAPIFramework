@@ -2,8 +2,16 @@
 
     final class App{
 
-        private function __construc(){
-            $this -> routers = [];
+        static private $instance = null;
+
+        private function __construct() {
+            $this -> routers = array();
+        }
+
+        static public function getInstance() {
+            if(is_null(self::$instance))
+                self::$instance = new App();
+            return self::$instance;
         }
         
         public function setEndpoint($url, $router, $middelwares = []){
