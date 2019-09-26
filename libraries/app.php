@@ -27,7 +27,7 @@
                 $method = $router -> getRequestMethod();
                 $route = str_replace($endpoint, "", $url) === "" ? "/" : str_replace($endpoint, "", $url);
                 $path = $router -> findPath($method, $route);
-                $params = $router -> getParamOfPath($path, $route);
+                $params = $router -> getParamOfPath($method, $route);
                 $body = $router -> getRequestBody();
                 if ($body)
                     $params = array_merge($params, $body);
