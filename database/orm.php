@@ -20,7 +20,6 @@
 
         private function __construct() {
             $this -> tablesName = array();
-            $this -> tables = array();
         }
 
         static public function getInstance() {
@@ -31,13 +30,15 @@
 
         public function newTable($tableName, $columnsName) {
             if (in_array($tableName, $this -> tablesName))
-                ExceptionHandler::throw($tableName . " already existed" , 1);
+                ExceptionHandler::throw($tableName . " already exist" , 1);
             array_push($this -> tablesName, $tableName);
             $this -> tables[$tableName] = new Table($tableName, $columnsName);
         }
 
-        public function getTable($tableName = null) {
-            return isset($tableName) ? $this -> tables[$tableName] : $this -> tables;
+        public function getTable($tableName) {
+            if (!in_array($tableName, $this -> tablesName))
+                ExceptionHandler::throw($tableName . " do not exist" , 1);
+            return $this -> tables[$tableName];
         }
 
     }
