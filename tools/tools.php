@@ -15,12 +15,6 @@
     //     );
     // }
 
-    /**
-     * Flatten an array recursively
-     * @param Array $a The array to flatten
-     * @param Boolean $kk Does the function keep keys
-     * @param Array $af The flatten array
-     */
     function array_flatten($a, $kk = false, $af = array()) {
         foreach ($a as $k => $v) {
             if (!is_array($v)) {

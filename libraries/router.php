@@ -88,7 +88,8 @@
         }
 
         public function getRequestBody(){
-            return count($_REQUEST) > 0 ? array($_REQUEST) : null;
+            $body = file_get_contents('php://input');
+            return $body != "" ? ["body" => json_decode($body, true)] : null;
         }
 
     }

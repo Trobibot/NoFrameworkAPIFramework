@@ -14,10 +14,10 @@
             return self::$instance;
         }
         
-        public function setEndpoint($url, $router, $middelwares = []){
+        public function setEndpoint($url, $router, $middlewares = []){
             if(!isset($this -> routers[$url])){
                 $router -> endpoint = $url;
-                $router -> middelwares = $middelwares;
+                $router -> middlewares = $middlewares;
                 $this -> routers[$url] = $router;
             } else {
                 try {
@@ -30,6 +30,8 @@
 
         public function listen($url){
             try{
+                if (BASE_URL)
+                    $url = str_replace(BASE_URL, "", $url);
                 $endpoint = $this -> findEndpoint($url);
                 $router = $this -> routers[$endpoint];
                 $method = $router -> getRequestMethod();
@@ -39,11 +41,11 @@
                 $body = $router -> getRequestBody();
                 if ($body)
                     $params = array_merge($params, $body);
-                foreach ($router -> middelwares as $middelware) {
-                    $middelware();
+                foreach ($router -> middlewares as $middleware) {
+                    $middleware();
                 }
-                foreach ($router -> $method[$path] as $middelware) {
-                    call_user_func_array($middelware, $params);
+                foreach ($router -> $method[$path] as $middleware) {
+                    call_user_func_array($middleware, $params);
                 }
             } catch (Exception $exc){
                 ExceptionHandler::catch($exc);

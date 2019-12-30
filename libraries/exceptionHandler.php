@@ -9,4 +9,12 @@
             exit;
         }
 
+        static public function throw($message, $code) {
+            try {
+                throw new Exception($message , $code);
+            } catch (Exception $exc) {
+                ExceptionHandler::catch($exc);
+            }
+        }
+
     }

@@ -6,6 +6,8 @@
     require_once (ROOT . "/libraries/initConf.php");
 
     // Import Framework's Libraries
+    require_once (ROOT . "/database/orm.php");
+    require_once (ROOT . "/database/operator.enum.php");
     require_once (ROOT . "/libraries/app.php");
     require_once (ROOT . "/libraries/router.php");
     require_once (ROOT . "/libraries/handler.php");
@@ -14,11 +16,10 @@
     require_once (ROOT . "/tools/tools.php");
 
     // Import User's Scripts
-    require_once (ROOT . "/database/orm.php");
-    require_once (ROOT . "/handlers/root.handler.php");
-    require_once (ROOT . "/routers/root.router.php");
-    require_once (ROOT . "/handlers/demo/users.handler.php");
-    require_once (ROOT . "/routers/demo/users.router.php");
+    require_once (ROOT . "/path/root.handler.php");
+    require_once (ROOT . "/path/root.router.php");
+    require_once (ROOT . "/path/users/users.handler.php");
+    require_once (ROOT . "/path/users/users.router.php");
 
     $orm = ORM::getInstance();
     $orm -> newTable("USERS",    ["nickname", "password"]);

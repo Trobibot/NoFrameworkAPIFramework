@@ -2,16 +2,16 @@
 
     /** TODO
      * IMPROVEMENTS:
-     *  [ ] Querys to browers table's rows (pseudo graphQL)
+     *  [ ] Find a way to query through tables (pseudo graphQL)
      *  [ ] Use real database
      *  [ ] Constrain tables
      *  [ ] Primary and foreign keys
      * 
      * BUGS:
-     *  [ ] 2 tables can have the same name
+     *  [X] 2 tables can have the same name
      * 
      * REWORKS:
-     *  [ ] Exception handling
+     *  [X] Exception handling
     */
 
     class ORM {
@@ -19,6 +19,7 @@
         static private $instance = null;
 
         private function __construct() {
+            $this -> tablesName = array();
             $this -> tables = array();
         }
 
@@ -29,6 +30,9 @@
         }
 
         public function newTable($tableName, $columnsName) {
+            if (in_array($tableName, $this -> tablesName))
+                ExceptionHandler::throw($tableName . " already existed" , 1);
+            array_push($this -> tablesName, $tableName);
             $this -> tables[$tableName] = new Table($tableName, $columnsName);
         }
 
@@ -50,13 +54,8 @@
 
         private function setColumnsName($columnsName) {
             foreach (array_merge(["id"], $columnsName) as $columnName) {
-                if (in_array($columnName, $this -> columnsName)) {
-                    try {
-                        throw new Exception($columnName . " is already used in table : " . $this -> name , 1);
-                    } catch (Exception $exc) {
-                        ExceptionHandler::catch($exc);
-                    }
-                }
+                if (in_array($columnName, $this -> columnsName))
+                    ExceptionHandler::throw($columnName . " is already used in table: " . $this -> name, 1);
                 array_push($this -> columnsName, $columnName);
             }
         }
@@ -64,13 +63,8 @@
         public function newRow($columnsData) {
             $tempRow = array_fill_keys($this -> columnsName, null);
             foreach ($columnsData as $columnName => $columnData) {
-                if (!in_array($columnName, $this -> columnsName)) {
-                    try {
-                        throw new Exception($this -> name . " do not contain a column named : " . $columnName, 1);
-                    } catch (Exception $exc) {
-                        ExceptionHandler::catch($exc);
-                    }
-                }
+                if (!in_array($columnName, $this -> columnsName))
+                    ExceptionHandler::throw($this -> name . " do not contain a column named: " . $columnName, 1);
                 $tempRow[$columnName] = $columnData;
             }
             $tempRow["id"] = ++$this -> lastId;
@@ -81,7 +75,7 @@
             if (is_null($queries))
                 return $this -> rows;
              ### TEMP CODE ###
-             return $this -> rows;
+             return $queries;
         }
 
     }
