@@ -2,7 +2,7 @@
 
     function getUsers(){
         return function($body = null){
-            Response::send(ORM::getInstance() -> getTable("USERS") -> getRowByQuery($body), 200);
+            // Response::send(ORM::getInstance() -> getTable("USERS") -> getRowByQuery($body), 200);
         };
     }
 
