@@ -13,7 +13,7 @@
             try {
                 throw new Exception($message , $code);
             } catch (Exception $exc) {
-                ExceptionHandler::catch($exc);
+                self::catch($exc);
             }
         }
 
