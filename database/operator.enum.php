@@ -16,7 +16,7 @@
             if (array_key_exists($enumerator, $enumerators))
                 return $enumerators[$enumerator];
             else
-                throw new Exception($enumerator . " is not a good operator's enumerator", 400);
+                throw new Exception($enumerator . " is not a valid operator's enumerator", 400);
         }
 
     }
