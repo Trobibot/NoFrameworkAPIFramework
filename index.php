@@ -23,18 +23,17 @@
     require_once (ROOT . "/path/users/users.handler.php");
     require_once (ROOT . "/path/users/users.router.php");
 
-    /*
     $orm = ORM::getInstance();
-    $orm -> newTable("USERS",    ["nickname", "password"]);
-    $orm -> newTable("CONTESTS", ["first_player", "second_player", "winner"]);
+    $orm -> getTable("USERS")       -> deleteRow();
+    $orm -> getTable("CONTESTS")    -> deleteRow();
 
-    $orm -> getTable("USERS")    -> newRow(["nickname"      => "Bradley"    , "password"      => "Pirate"   ]);
-    $orm -> getTable("USERS")    -> newRow(["nickname"      => "Bertille"   , "password"      => "Crochue"  ]);
-    $orm -> getTable("USERS")    -> newRow(["nickname"      => "Jean"       , "password"      => "Guy"      ]);
-    $orm -> getTable("CONTESTS") -> newRow(["first_player"  => "1"          , "second_player" => "2"        , "winner" => "1"   ]);
-    $orm -> getTable("CONTESTS") -> newRow(["first_player"  => "1"          , "second_player" => "3"        , "winner" => "3"   ]);
-    $orm -> getTable("CONTESTS") -> newRow(["first_player"  => "2"          , "second_player" => "3"        , "winner" => "tie" ]);
-    */
+    $bradleyId  = $orm -> getTable("USERS") -> addRow(["nickname" => "Bradley"    , "password" => "Pirate" ]);
+    $bertilleId = $orm -> getTable("USERS") -> addRow(["nickname" => "Bertille"   , "password" => "Crochue" ]);
+    $jeanId     = $orm -> getTable("USERS") -> addRow(["nickname" => "Jean"       , "password" => "Guy" ]);
+
+    $orm -> getTable("CONTESTS") -> addRow(["first_user" => $bradleyId    , "second_user" => $bertilleId  , "winner" => $bradleyId]);
+    $orm -> getTable("CONTESTS") -> addRow(["first_user" => $bradleyId    , "second_user" => $jeanId      , "winner" => $bertilleId]);
+    $orm -> getTable("CONTESTS") -> addRow(["first_user" => $bertilleId   , "second_user" => $jeanId      , "winner" => "-1"]);
 
     $app = App::getInstance();
     $app -> setEndpoint("/", $rootRouter);
