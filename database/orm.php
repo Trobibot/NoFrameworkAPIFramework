@@ -17,9 +17,9 @@
     class ORM {
 
         static private $instance = null;
-        private $db;
+        protected $db;
 
-        private function __construct() {
+        protected function __construct() {
             $this -> db = DBConnector::getInstance();
         }
 
@@ -33,7 +33,7 @@
             if (!$this -> db -> doesTableExists($tableName))
                 ExceptionHandler::throw($tableName . " do not exist" , 1);
             $tableColumns = $this -> db -> getTableColumns($tableName);
-            $ormTable = ORMTable::getInstance($tableName, $tableColumns);
+            $ormTable = ORMTable::getInstance();
             $ormTable -> setName($tableName);
             $ormTable -> setColumns($tableColumns);
             return $ormTable;
@@ -41,16 +41,11 @@
 
     }
 
-    class ORMTable {
+    class ORMTable extends ORM {
 
         static private $instance = null;
-        private $db;
         private $name;
         private $columns;
-
-        private function __construct() {
-            $this -> db = DBConnector::getInstance();
-        }
 
         static public function getInstance() {
             if(is_null(self::$instance))
@@ -58,7 +53,7 @@
             return self::$instance;
         }
 
-        public function setName($name) {
+        protected function setName($name) {
             $this -> name = $name;
         }
 
@@ -66,7 +61,7 @@
             return $this -> name;
         }
 
-        public function setColumns($columns) {
+        protected function setColumns($columns) {
             $this -> columns = $columns;
         }
 
@@ -98,7 +93,19 @@
             if (count($notExistingColumns) > 0)
                 ExceptionHandler::throw("This column(s) " . implode(", ", $notExistingColumns) . " doesn't exists.", 1);
 
-            var_dump($this -> db -> insert($this -> name, $data));
+            $rowId = $this -> db -> insert($this -> name, $data);
+            if(!$rowId)
+                ExceptionHandler::throw("Could not insert row: [" . implode(", ", $data) . "]", 1);
+
+            return $rowId;
+        }
+
+        public function getRowByQuery($filters = []) {
+            return $this -> db -> select($this -> name, $filters);
+        }
+
+        public function deleteRow($rowId = null) {
+            return $this -> db -> delete($this -> name, $rowId);
         }
 
     }
