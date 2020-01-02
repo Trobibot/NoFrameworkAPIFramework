@@ -17,3 +17,11 @@
     $usersRouter -> get("/:idUser/contests/:idContest", [
         getUserContestBy()
     ]);
+
+    $usersRouter -> post("/", [
+        addUser()
+    ]);
+
+    $usersRouter -> delete("/:idUser", [
+        deleteUser()
+    ]);

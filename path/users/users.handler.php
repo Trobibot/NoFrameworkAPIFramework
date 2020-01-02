@@ -2,7 +2,7 @@
 
     function getUsers(){
         return function($body = null){
-            // Response::send(ORM::getInstance() -> getTable("USERS") -> getRowByQuery($body), 200);
+            Response::send(ORM::getInstance() -> getTable("USERS") -> getRowByQuery(), 200);
         };
     }
 
@@ -14,25 +14,24 @@
 
     function getUserContests(){
         return function($idUser){
-            Response::send(ORM::getInstance() -> getTable("CONTESTS") -> getRowByQuery(["first_player" => $idUser]), 200);
+            Response::send(ORM::getInstance() -> getTable("CONTESTS") -> getRowByQuery(["first_user" => $idUser]), 200);
         };
     }
 
     function getUserContestBy(){
         return function($idUser, $idOpponent){
-            Response::send(ORM::getInstance() -> getTable("CONTESTS") -> getRowByQuery(["first_player" => $idUser, "second_player" => $idOpponent]), 200);
+            Response::send(ORM::getInstance() -> getTable("CONTESTS") -> getRowByQuery(["first_user" => $idUser, "second_user" => $idOpponent]), 200);
         };
     }
 
-    // function addUser(){
-    //     return function(){
-    //         Response::send("NoFramework API V0.1", 200);
-    //     };
-    // }
+    function addUser(){
+        return function($userData){
+            Response::send(ORM::getInstance() -> getTable("USERS") -> addRow($userData), 200);
+        };
+    }
 
-
-    // function deleteUser(){
-    //     return function(){
-    //         Response::send("NoFramework API V0.1", 200);
-    //     };
-    // }
+    function deleteUser(){
+        return function($userId){
+            Response::send(ORM::getInstance() -> getTable("USERS") -> deleteRow($userId), 200);
+        };
+    }
