@@ -66,9 +66,10 @@
             return $query -> fetchAll(PDO::FETCH_ASSOC);
         }
 
-        public function delete($tableName, $rowId) {
-            // $sqlFilters = empty($filters) ? "" : " WHERE " . implode(" AND ", array_map(function($item) { return "$item = :$item"; }, array_keys($filters)));
-            $sqlQuery = "DELETE FROM $tableName WHERE id = :id";
+        public function delete($tableName, $rowId = null) {
+            $sqlFilters = is_null(rowId) ? "" : " WHERE id = :id";
+            $sqlQuery = "DELETE FROM $tableName";
+            
             $query = $this -> db -> prepare($sqlQuery);
             $query -> bindValue(":id", $rowId, PDO::PARAM_INT);
             return $query -> execute();
