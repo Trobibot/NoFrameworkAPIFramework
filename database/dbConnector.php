@@ -32,13 +32,36 @@
             $query -> execute();
             $tempArray = array();
             foreach ($query -> fetchAll(PDO::FETCH_ASSOC) as $item) {
-                $tempArray[$item["Field"]] = [
-                    "canBeNull" => $item["Null"] == "NO" ? false : true,
-                    "defaultValue" => $item["Default"],
-                    "isAutoIncrement" => $item["Extra"] == "auto_increment" ? true : false
-                ];
+                preg_match("/(.+)\\((\\d+)\\)/", $item["Type"], $columnType);
+                $row = new ORMColumn($item["Field"]);
+                $row -> setType($columnType[1]) -> setLength($columnType[2]);
+                if ($item["Key"] == "PRI")
+                    $row -> setPrimaryKey();
+                if ($item["Null"] != "NO")
+                    $row -> setNullable();
+                if (!is_null($item["Default"]))
+                    $row -> setDefaultValue($item["Default"]);
+                array_push($tempArray, $row);
             }
             return $tempArray;
+        }
+
+        public function createTable($tableName, $tableColumns) {
+
+            $strColumns = implode(", ", array_map(function($column) { return $column -> toSQL(); }, $tableColumns));
+            $primaryKeys = array_filter($tableColumns, function($column) { return !!$column -> getPrimaryKey(); });
+            $foreignKeys = array_filter($tableColumns, function($column) { return !!$column -> getForeignKey(); });
+
+            $sqlQuery = "CREATE TABLE IF NOT EXISTS $tableName ($strColumns";
+            if(!empty($primaryKeys))
+                $sqlQuery .= ", PRIMARY KEY(" . $primaryKeys[0] -> getName() . ")";
+            if(!empty($foreignKeys))
+                foreach ($foreignKeys as $column)
+                    $sqlQuery .= ", FOREIGN KEY (" . $column -> getName() . ") REFERENCES " . $column -> getForeignKey() -> getTable() . "(" . $column -> getForeignKey() -> getName() . ")";
+            $sqlQuery .= ")";
+
+            $query = $this -> db -> prepare($sqlQuery);
+            return $query -> execute();
         }
 
         public function insert($tableName, $data) {
@@ -67,8 +90,8 @@
         }
 
         public function delete($tableName, $rowId = null) {
-            $sqlFilters = is_null(rowId) ? "" : " WHERE id = :id";
-            $sqlQuery = "DELETE FROM $tableName";
+            $sqlFilters = is_null($rowId) ? "" : " WHERE id = :id";
+            $sqlQuery = "DELETE FROM $tableName $sqlFilters";
             
             $query = $this -> db -> prepare($sqlQuery);
             $query -> bindValue(":id", $rowId, PDO::PARAM_INT);

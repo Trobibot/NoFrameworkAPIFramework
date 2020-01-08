@@ -3,9 +3,10 @@
     /** TODO
      * IMPROVEMENTS:
      *  [ ] Find a way to query through tables (pseudo graphQL)
-     *  [ ] Use real database
-     *  [ ] Constrain tables
-     *  [ ] Primary and foreign keys
+     *  [X] Use real database
+     *  [X] Constrain tables
+     *  [X] Primary and foreign keys
+     *  [ ] Delete action on constrained
      * 
      * BUGS:
      *  [X] 2 tables can have the same name
@@ -39,6 +40,20 @@
             return $ormTable;
         }
 
+        public function addTable($tableName, $tableColumns) {
+            if ($this -> db -> doesTableExists($tableName))
+                ExceptionHandler::throw($tableName . " already exist" , 1);
+            
+        }
+
+        public function createTable($tableName, $tableColumns = null) {
+            return $this -> db -> createTable($tableName, $tableColumns);
+        }
+
+        public function defineColumn($rowName) {
+            return new ORMColumn($rowName);
+        }
+
     }
 
     class ORMTable extends ORM {
@@ -69,27 +84,39 @@
             return $this -> columns;
         }
 
+        public function getColumn($columnName) {
+            foreach ($this -> getColumns() as $column)
+                if ($column -> getName() == $columnName) {
+                    $column -> setTable($this -> name);
+                    return $column;
+                }
+        }
+
         public function addRow($data) {
+
             $obligatoryColumns = array_filter(
                 $this -> getColumns(),
                 function($item) {
-                    return !$item["canBeNull"] && !$item["isAutoIncrement"];
+                    return !$item -> getNullable() && !$item -> getPrimaryKey();
                 }
             );
 
             // Test if all obligatory columns are provided
             $nonProvidedObligatoryColumns = array();
-            foreach ($obligatoryColumns as $columnName => $columnValue)
-                if (!array_key_exists($columnName, $data))
-                    array_push($nonProvidedObligatoryColumns, $columnName);
+            foreach ($obligatoryColumns as $column)
+                if (!array_key_exists($column -> getName(), $data))
+                    array_push($nonProvidedObligatoryColumns, $column -> getName());
+
             if (count($nonProvidedObligatoryColumns) > 0)
                 ExceptionHandler::throw("Column(s) " . implode(", ", $nonProvidedObligatoryColumns) . " can't be Null.", 1);
 
             // Test if columns from given data exists
-            $notExistingColumns = array();
-            foreach ($data as $columnName => $columnValue)
-                if (!array_key_exists($columnName, $this -> columns))
-                    array_push($notExistingColumns, $columnName);
+            $providedColumns = array();
+            foreach ($this -> columns as $column)
+                if (array_key_exists($column -> getName(), $data))
+                    array_push($providedColumns, $column -> getName());
+            $notExistingColumns = array_diff(array_keys($data), $providedColumns);
+
             if (count($notExistingColumns) > 0)
                 ExceptionHandler::throw("This column(s) " . implode(", ", $notExistingColumns) . " doesn't exists.", 1);
 
@@ -110,72 +137,125 @@
 
     }
 
-    /*
-    class ORM {
+    class ORMColumn {
 
-        static private $instance = null;
+        private $table;
+        private $name;
+        private $type;
+        private $length;
+        private $defaultValue;
+        private $nullable = false;
+        private $foreignKey = false;
+        private $primaryKey = false;
+        private $autoIncrement = false;
 
-        private function __construct() {
-            $this -> tablesName = array();
-            $this -> tables = array();
+        public function __construct($columnName) {
+            $this -> name = $columnName;
         }
 
-        static public function getInstance() {
-            if(is_null(self::$instance))
-                self::$instance = new ORM();
-            return self::$instance;
+        public function toSQL() {
+            $name           = $this -> getName();
+            $type           = $this -> getType();
+            $length         = $this -> getLength();
+            $autoIncrement  = ($this -> getAutoIncrement() ? "AUTO_INCREMENT" : "");
+            $nullable       = (!$this -> getNullable() ? "NOT NULL" : "");
+            return "$name $type($length) $autoIncrement $nullable";
         }
 
-        public function newTable($tableName, $columnsName) {
-            if (in_array($tableName, $this -> tablesName))
-                ExceptionHandler::throw($tableName . " already exist" , 1);
-            array_push($this -> tablesName, $tableName);
-            $this -> tables[$tableName] = new Table($tableName, $columnsName);
+        public function getTable() {
+            return $this -> table;
         }
 
-        public function getTable($tableName) {
-            if (!in_array($tableName, $this -> tablesName))
-                ExceptionHandler::throw($tableName . " do not exist" , 1);
-            return $this -> tables[$tableName];
+        public function setTable($table) {
+            if (!is_null($this -> getTable()))
+                ExceptionHandler::throw("Data table of column " . $this -> getName() . " is already defined.", 1);
+            $this -> table = $table;
+            return $this;
+        }
+
+        public function getName() {
+            return $this -> name;
+        }
+
+        public function getType() {
+            return $this -> type;
+        }
+
+        public function setType($type) {
+            if (!is_null($this -> getType()))
+                ExceptionHandler::throw("Data type of column " . $this -> getName() . " is already defined.", 1);
+            $this -> type = strtoupper($type);
+            return $this;
+        }
+
+        public function getLength() {
+            return $this -> length;
+        }
+
+        public function setLength($length) {
+            if (!is_null($this -> getLength()))
+                ExceptionHandler::throw("Data length of column " . $this -> getName() . " is already defined.", 1);
+            $this -> length = $length;
+            return $this;
+        }
+
+        public function getNullable() {
+            return $this -> nullable;
+        }
+
+        public function setNullable() {
+            if ($this -> getNullable())
+                ExceptionHandler::throw("Data nullable of column " . $this -> getName() . " is already defined.", 1);
+            if (!is_null($this -> getDefaultValue()))
+                ExceptionHandler::throw("Column " . $this -> getName() . " can't be nullable. Default value has already been defined.", 1);
+            $this -> nullable = true;
+            return $this;
+        }
+
+        public function getDefaultValue() {
+            return $this -> defaultValue;
+        }
+
+        public function setDefaultValue($defaultValue) {
+            if (!is_null($this -> getDefaultValue()))
+                ExceptionHandler::throw("Data default value of column " . $this -> getName() . " is already defined.", 1);
+            if ($this -> getNullable())
+                ExceptionHandler::throw("Column " . $this -> getName() . " can't have a default value. Nullable has already been defined.", 1);
+            $this -> defaultValue = $defaultValue;
+            return $this;
+        }
+
+        public function getPrimaryKey() {
+            return $this -> primaryKey;
+        }
+
+        public function setPrimaryKey() {
+            if ($this -> getPrimaryKey())
+                ExceptionHandler::throw("Data primary key of column " . $this -> getName() . " is already defined.", 1);
+            $this -> primaryKey = true;
+            return $this;
+        }
+
+        public function getAutoIncrement() {
+            return $this -> autoIncrement;
+        }
+
+        public function setAutoIncrement() {
+            if ($this -> getAutoIncrement())
+                ExceptionHandler::throw("Data auto increment of column " . $this -> getName() . " is already defined.", 1);
+            $this -> autoIncrement = true;
+            return $this;
+        }
+
+        public function getForeignKey() {
+            return $this -> foreignKey;
+        }
+
+        public function setForeignKey($targetColumn) {
+            if ($this -> getForeignKey())
+                ExceptionHandler::throw("Data foreign key of column " . $this -> getName() . " is already defined.", 1);
+            $this -> foreignKey = $targetColumn;
+            return $this;
         }
 
     }
-
-    class Table {
-
-        public function __construct($tableName, $columnsName) {
-            $this -> name = $tableName;
-            $this -> rows = array();
-            $this -> columnsName = array();
-            $this -> lastId = 0;
-            $this -> setColumnsName($columnsName);
-        }
-
-        private function setColumnsName($columnsName) {
-            foreach (array_merge(["id"], $columnsName) as $columnName) {
-                if (in_array($columnName, $this -> columnsName))
-                    ExceptionHandler::throw($columnName . " is already used in table: " . $this -> name, 1);
-                array_push($this -> columnsName, $columnName);
-            }
-        }
-
-        public function newRow($columnsData) {
-            $tempRow = array_fill_keys($this -> columnsName, null);
-            foreach ($columnsData as $columnName => $columnData) {
-                if (!in_array($columnName, $this -> columnsName))
-                    ExceptionHandler::throw($this -> name . " do not contain a column named: " . $columnName, 1);
-                $tempRow[$columnName] = $columnData;
-            }
-            $tempRow["id"] = ++$this -> lastId;
-            array_push($this -> rows, $tempRow);
-        }
-
-        public function getRowByQuery($queries = null) {
-            if (is_null($queries))
-                return $this -> rows;
-             ### TEMP CODE ###
-             return $queries;
-        }
-
-    }
-    */
