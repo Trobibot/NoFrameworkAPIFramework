@@ -1,5 +1,7 @@
 <?php
 
+header('Content-Type: ' . CONTENT_TYPE);
+
     // Set Reporting
     if (DEV_ENV) {
         error_reporting(E_ALL);

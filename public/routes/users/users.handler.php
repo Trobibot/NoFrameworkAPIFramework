@@ -19,8 +19,8 @@
     }
 
     function getUserContestBy(){
-        return function($idUser, $idOpponent){
-            Response::send(ORM::getInstance() -> getTable("CONTESTS") -> getRowByQuery(["first_user" => $idUser, "second_user" => $idOpponent]), 200);
+        return function($idUser, $idContest){
+            Response::send(ORM::getInstance() -> getTable("CONTESTS") -> getRowByQuery(["first_user" => $idUser, "id" => $idContest]), 200);
         };
     }
 

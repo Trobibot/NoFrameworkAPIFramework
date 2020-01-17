@@ -32,7 +32,7 @@
 
         public function getTable($tableName) {
             if (!$this -> db -> doesTableExists($tableName))
-                ExceptionHandler::throw($tableName . " do not exist" , 1);
+                return false;
             $tableColumns = $this -> db -> getTableColumns($tableName);
             $ormTable = ORMTable::getInstance();
             $ormTable -> setName($tableName);
@@ -42,11 +42,11 @@
 
         public function addTable($tableName, $tableColumns) {
             if ($this -> db -> doesTableExists($tableName))
-                ExceptionHandler::throw($tableName . " already exist" , 1);
+                ExceptionHandler::throw("Table " . $tableName . " already exist" , 1);
             return $this -> db -> createTable($tableName, $tableColumns);
         }
 
-        public function defineColumn($rowName) {
+        public function setColumn($rowName) {
             return new ORMColumn($rowName);
         }
 
@@ -83,7 +83,7 @@
         public function getColumn($columnName) {
             foreach ($this -> getColumns() as $column)
                 if ($column -> getName() == $columnName) {
-                    $column -> setTable($this -> name);
+                    $column -> setTableName($this -> name);
                     return $column;
                 }
         }
@@ -144,12 +144,13 @@
         private $foreignKey = false;
         private $primaryKey = false;
         private $autoIncrement = false;
-        private const VALIDDATATYPES = ["TINYINT", "SMALLINT", "MEDIUMINT", "INT", "BIGINT", "FLOAT", "DOUBLE", "DATETIME", "DATE", "TIMESTAMP", "CHAR", "VARCHAR", "BINARY", "VARBINARY", "BLOB", "TEXT"];
+        private $VALIDDATATYPES = ["TINYINT", "SMALLINT", "MEDIUMINT", "INT", "BIGINT", "FLOAT", "DOUBLE", "DATETIME", "DATE", "TIMESTAMP", "CHAR", "VARCHAR", "BINARY", "VARBINARY", "BLOB", "TEXT"];
 
         public function __construct($columnName) {
             if (!preg_match("/^[\w_-]+$/", $columnName))
                 ExceptionHandler::throw("Data name in the column '" . $columnName . "' do not respect naming conventions.", 1);
             $this -> name = $columnName;
+            parent::__construct();
         }
 
         public function toSQL() {
@@ -165,14 +166,14 @@
             return $this -> name;
         }
 
-        public function getTable() {
+        public function getTableName() {
             return $this -> table;
         }
 
-        public function setTable($table) {
-            if (!$this -> db -> doesTableExists($tableName))
+        public function setTableName($table) {
+            if (!$this -> db -> doesTableExists($table))
                 ExceptionHandler::throw("Data table in the column '" . $this -> getName() . "' does not refer to an existing table.", 1);
-            if (!is_null($this -> getTable()))
+            if (!is_null($this -> getTableName()))
                 ExceptionHandler::throw("Data table in the column '" . $this -> getName() . "' is already defined.", 1);
             $this -> table = $table;
             return $this;
@@ -183,7 +184,7 @@
         }
 
         public function setType($type) {
-            if (in_array($type, $this -> VALIDDATATYPES))
+            if (!in_array("INT", $this -> VALIDDATATYPES))
                 ExceptionHandler::throw("Data type in the column '" . $this -> getName() . "' is not a valid data type.", 1);
             if (!is_null($this -> getType()))
                 ExceptionHandler::throw("Data type in the column '" . $this -> getName() . "' is already defined.", 1);
@@ -196,8 +197,8 @@
         }
 
         public function setLength($length) {
-            if (in_int($length))
-                ExceptionHandler::throw("Data legnth in the column '" . $this -> getName() . "' is not an integer.", 1);
+            if (gettype($length) != "integer")
+                ExceptionHandler::throw("Data length in the column '" . $this -> getName() . "' is not an integer.", 1);
             if (!is_null($this -> getLength()))
                 ExceptionHandler::throw("Data length in the column '" . $this -> getName() . "' is already defined.", 1);
             $this -> length = $length;

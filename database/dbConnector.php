@@ -34,7 +34,7 @@
             foreach ($query -> fetchAll(PDO::FETCH_ASSOC) as $item) {
                 preg_match("/(.+)\\((\\d+)\\)/", $item["Type"], $columnType);
                 $row = new ORMColumn($item["Field"]);
-                $row -> setType($columnType[1]) -> setLength($columnType[2]);
+                $row -> setType($columnType[1]) -> setLength(intval($columnType[2]));
                 if ($item["Key"] == "PRI")
                     $row -> setPrimaryKey();
                 if ($item["Null"] != "NO")
@@ -57,7 +57,7 @@
                 $sqlQuery .= ", PRIMARY KEY(" . $primaryKeys[0] -> getName() . ")";
             if(!empty($foreignKeys))
                 foreach ($foreignKeys as $column)
-                    $sqlQuery .= ", FOREIGN KEY (" . $column -> getName() . ") REFERENCES " . $column -> getForeignKey() -> getTable() . "(" . $column -> getForeignKey() -> getName() . ")";
+                    $sqlQuery .= ", FOREIGN KEY (" . $column -> getName() . ") REFERENCES " . $column -> getForeignKey() -> getTableName() . "(" . $column -> getForeignKey() -> getName() . ")";
             $sqlQuery .= ")";
 
             $query = $this -> db -> prepare($sqlQuery);
