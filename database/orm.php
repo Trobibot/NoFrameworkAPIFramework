@@ -43,10 +43,6 @@
         public function addTable($tableName, $tableColumns) {
             if ($this -> db -> doesTableExists($tableName))
                 ExceptionHandler::throw($tableName . " already exist" , 1);
-            
-        }
-
-        public function createTable($tableName, $tableColumns = null) {
             return $this -> db -> createTable($tableName, $tableColumns);
         }
 
@@ -137,7 +133,7 @@
 
     }
 
-    class ORMColumn {
+    class ORMColumn extends ORM{
 
         private $table;
         private $name;
@@ -148,8 +144,11 @@
         private $foreignKey = false;
         private $primaryKey = false;
         private $autoIncrement = false;
+        private const VALIDDATATYPES = ["TINYINT", "SMALLINT", "MEDIUMINT", "INT", "BIGINT", "FLOAT", "DOUBLE", "DATETIME", "DATE", "TIMESTAMP", "CHAR", "VARCHAR", "BINARY", "VARBINARY", "BLOB", "TEXT"];
 
         public function __construct($columnName) {
+            if (!preg_match("/^[\w_-]+$/", $columnName))
+                ExceptionHandler::throw("Data name in the column '" . $columnName . "' do not respect naming conventions.", 1);
             $this -> name = $columnName;
         }
 
@@ -162,19 +161,21 @@
             return "$name $type($length) $autoIncrement $nullable";
         }
 
+        public function getName() {
+            return $this -> name;
+        }
+
         public function getTable() {
             return $this -> table;
         }
 
         public function setTable($table) {
+            if (!$this -> db -> doesTableExists($tableName))
+                ExceptionHandler::throw("Data table in the column '" . $this -> getName() . "' does not refer to an existing table.", 1);
             if (!is_null($this -> getTable()))
-                ExceptionHandler::throw("Data table of column " . $this -> getName() . " is already defined.", 1);
+                ExceptionHandler::throw("Data table in the column '" . $this -> getName() . "' is already defined.", 1);
             $this -> table = $table;
             return $this;
-        }
-
-        public function getName() {
-            return $this -> name;
         }
 
         public function getType() {
@@ -182,8 +183,10 @@
         }
 
         public function setType($type) {
+            if (in_array($type, $this -> VALIDDATATYPES))
+                ExceptionHandler::throw("Data type in the column '" . $this -> getName() . "' is not a valid data type.", 1);
             if (!is_null($this -> getType()))
-                ExceptionHandler::throw("Data type of column " . $this -> getName() . " is already defined.", 1);
+                ExceptionHandler::throw("Data type in the column '" . $this -> getName() . "' is already defined.", 1);
             $this -> type = strtoupper($type);
             return $this;
         }
@@ -193,8 +196,10 @@
         }
 
         public function setLength($length) {
+            if (in_int($length))
+                ExceptionHandler::throw("Data legnth in the column '" . $this -> getName() . "' is not an integer.", 1);
             if (!is_null($this -> getLength()))
-                ExceptionHandler::throw("Data length of column " . $this -> getName() . " is already defined.", 1);
+                ExceptionHandler::throw("Data length in the column '" . $this -> getName() . "' is already defined.", 1);
             $this -> length = $length;
             return $this;
         }
@@ -205,9 +210,9 @@
 
         public function setNullable() {
             if ($this -> getNullable())
-                ExceptionHandler::throw("Data nullable of column " . $this -> getName() . " is already defined.", 1);
+                ExceptionHandler::throw("Data nullable of column '" . $this -> getName() . "' is already defined.", 1);
             if (!is_null($this -> getDefaultValue()))
-                ExceptionHandler::throw("Column " . $this -> getName() . " can't be nullable. Default value has already been defined.", 1);
+                ExceptionHandler::throw("Column '" . $this -> getName() . "' can't be nullable. Default value has already been defined.", 1);
             $this -> nullable = true;
             return $this;
         }
@@ -217,10 +222,12 @@
         }
 
         public function setDefaultValue($defaultValue) {
+            if (!preg_match("/^[^;]+$/", $columnName))
+                ExceptionHandler::throw("Data default value in the column '" . $this -> getName() . "' do not respect naming conventions.", 1);
             if (!is_null($this -> getDefaultValue()))
-                ExceptionHandler::throw("Data default value of column " . $this -> getName() . " is already defined.", 1);
+                ExceptionHandler::throw("Data default value in the column '" . $this -> getName() . "' is already defined.", 1);
             if ($this -> getNullable())
-                ExceptionHandler::throw("Column " . $this -> getName() . " can't have a default value. Nullable has already been defined.", 1);
+                ExceptionHandler::throw("Column '" . $this -> getName() . "' can't have a default value. Nullable has already been defined.", 1);
             $this -> defaultValue = $defaultValue;
             return $this;
         }
@@ -231,7 +238,7 @@
 
         public function setPrimaryKey() {
             if ($this -> getPrimaryKey())
-                ExceptionHandler::throw("Data primary key of column " . $this -> getName() . " is already defined.", 1);
+                ExceptionHandler::throw("Data primary key in the column '" . $this -> getName() . "' is already defined.", 1);
             $this -> primaryKey = true;
             return $this;
         }
@@ -242,7 +249,7 @@
 
         public function setAutoIncrement() {
             if ($this -> getAutoIncrement())
-                ExceptionHandler::throw("Data auto increment of column " . $this -> getName() . " is already defined.", 1);
+                ExceptionHandler::throw("Data auto increment in the column '" . $this -> getName() . "' is already defined.", 1);
             $this -> autoIncrement = true;
             return $this;
         }
@@ -253,7 +260,7 @@
 
         public function setForeignKey($targetColumn) {
             if ($this -> getForeignKey())
-                ExceptionHandler::throw("Data foreign key of column " . $this -> getName() . " is already defined.", 1);
+                ExceptionHandler::throw("Data foreign key in the column '" . $this -> getName() . "' is already defined.", 1);
             $this -> foreignKey = $targetColumn;
             return $this;
         }
